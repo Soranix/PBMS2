@@ -8,7 +8,7 @@ import java.util.Locale
 
 
 @Entity(tableName = "books")
-data class Book (
+data class Book(
 @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String,
     val author: String,
@@ -19,7 +19,7 @@ data class Book (
 ) {
     // custom getter to calculate percentage
     val percentage: Int
-        get() = if (totalPages > 0) {
+        get() = if (totalPages != null && totalPages > 0) {
             (currentProgress * 100) / totalPages
         } else 0
 

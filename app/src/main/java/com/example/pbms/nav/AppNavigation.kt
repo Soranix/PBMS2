@@ -8,6 +8,7 @@ import com.example.pbms.view.AddScreen
 import com.example.pbms.view.HomeScreen
 import com.example.pbms.view.EditScreen
 
+// handles navigation
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
