@@ -10,6 +10,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -28,10 +30,14 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("My Books") })
+            CenterAlignedTopAppBar(title = { Text(text = "My Book", fontWeight = FontWeight.Bold) },
+            )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate(Screen.AddScreen.route)}) {
+            FloatingActionButton(onClick = { navController.navigate(Screen.AddScreen.route)},
+                containerColor = Color.Black,
+                contentColor = Color.White
+                ) {
                 Text("+")
             }
         }
@@ -54,17 +60,20 @@ fun HomeScreen(
                     .padding(horizontal = 16.dp)
             ) {
                 items(books) { book ->
-                    BookItem(book = book)
+                    BookItem(
+                        book = book,
+                        onClick = {navController.navigate(Screen.EditScreen.route)}
+                        )
                 }
             }
         }
     }
 }
 @Composable
-fun BookItem(book: Book) {
+fun BookItem(book: Book, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(4.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = book.title, style = MaterialTheme.typography.titleMedium)
