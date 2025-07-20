@@ -97,7 +97,6 @@ fun AddScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Genre dropdown
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -137,7 +136,7 @@ fun AddScreen(
                             totalPages = totalPages,
                             currentProgress = currentProgress
                         ) {
-                            navController.popBackStack()
+                            navController.popBackStack() // onSuccess
                         }
                     },
                     modifier = Modifier.align(Alignment.End),

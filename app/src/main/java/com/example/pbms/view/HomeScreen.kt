@@ -19,6 +19,8 @@ import com.example.pbms.model.data.Book
 import com.example.pbms.nav.Screen
 import com.example.pbms.viewmodel.HomeViewModel
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -33,6 +35,7 @@ fun HomeScreen(
             CenterAlignedTopAppBar(title = { Text(text = "My Book", fontWeight = FontWeight.Bold) },
             )
         },
+        // '+' button. Navigates to the Add screen
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate(Screen.AddScreen.route)},
                 containerColor = Color.Black,
@@ -62,7 +65,7 @@ fun HomeScreen(
                 items(books) { book ->
                     BookItem(
                         book = book,
-                        onClick = {navController.navigate(Screen.EditScreen.route)}
+                        onClick = { navController.navigate(Screen.EditScreen.withId(book.id)) }
                         )
                 }
             }

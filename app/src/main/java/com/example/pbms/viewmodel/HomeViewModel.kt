@@ -1,6 +1,7 @@
 package com.example.pbms.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pbms.model.data.AppDatabase
@@ -27,39 +28,12 @@ class HomeViewModel (application: Application) : AndroidViewModel(application){
     private val dao = DatabaseInstance.getDatabase(application).bookDao()
 
 
-
-    // This will launch automatically and I need it to get all the books from the database
-    init {
-        loadBooks()
-    }
     // this function will help load and refresh the database that the user will see
 
     // read
     fun loadBooks() {
         viewModelScope.launch {
             _books.value = dao.getAllBooks()
-        }
-    }
-
-    // add
-    fun addBook(book: Book) {
-        viewModelScope.launch {
-            dao.insertBook(book)
-            loadBooks()
-        }
-    }
-    // update book
-    fun updateBook(book: Book) {
-        viewModelScope.launch {
-            dao.updateBook(book)
-            loadBooks()
-        }
-    }
-    // delete
-    fun deleteBook(book: Book) {
-        viewModelScope.launch {
-            dao.deleteBook(book)
-            loadBooks()
         }
     }
 

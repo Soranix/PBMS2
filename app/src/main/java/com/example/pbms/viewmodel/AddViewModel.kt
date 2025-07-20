@@ -38,7 +38,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
             )
             dao.insertBook(book)
 
-            onSuccess() // navigate back
+            onSuccess() // pop back stack
 
         }
         fun loadBooks() {
@@ -46,6 +46,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
                 _books.value = dao.getAllBooks()
             }
         }
+
         fun updateBook(book: Book) {
             viewModelScope.launch {
                 dao.updateBook(book)
