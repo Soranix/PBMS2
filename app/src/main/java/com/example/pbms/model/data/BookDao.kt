@@ -14,11 +14,9 @@ interface BookDao {
     @Query("SELECT * FROM books WHERE id LIKE :id")
     suspend fun getBookById(id: Int): Book
 
+    // when you need to insert or overwrite existing data
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBook(book: Book)
-
-    @Delete
-    suspend fun delete(book: Book)
 
     @Query("DELETE FROM books WHERE title = :title")
     suspend fun deleteBookByTitle(title: String)
@@ -26,8 +24,12 @@ interface BookDao {
     @Delete
     suspend fun deleteBook(book: Book)
 
+    // for safe updates for existing data
     @Update
     suspend fun updateBook(book:Book)
+
+    @Query("SELECT * FROM books WHERE currentProgress < totalPages ORDER BY id ASC")
+    suspend fun getUnreadBooks(): List<Book>
 
 
 }

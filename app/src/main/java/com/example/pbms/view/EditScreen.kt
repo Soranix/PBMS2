@@ -130,27 +130,28 @@ fun EditScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // title
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
                     label = { Text("Title") },
                     modifier = Modifier.fillMaxWidth()
                 )
-
+                // author
                 OutlinedTextField(
                     value = author,
                     onValueChange = { author = it },
                     label = { Text("Author") },
                     modifier = Modifier.fillMaxWidth()
                 )
-
+                // genre. It was initially a dropdown menu but removed because of bugs
                 OutlinedTextField(
                     value = genre,
                     onValueChange = { genre = it },
                     label = { Text("Genre (optional)") },
                     modifier = Modifier.fillMaxWidth()
                 )
-
+                // total pages
                 OutlinedTextField(
                     value = totalPages,
                     onValueChange = { totalPages = it.filter { c -> c.isDigit() } },
@@ -158,7 +159,7 @@ fun EditScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
-
+                // current progress
                 OutlinedTextField(
                     value = currentProgress,
                     onValueChange = { currentProgress = it.filter { c -> c.isDigit() } },
@@ -169,6 +170,7 @@ fun EditScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Date picker button
                 Button(onClick = { datePickerDialog.show() },
                     modifier = Modifier.fillMaxWidth(),
                     colors = buttonColors(containerColor = Color.Black, contentColor = Color.White)) {
@@ -177,6 +179,7 @@ fun EditScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Delete button in red
                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                     Button(
                         onClick = {
@@ -189,6 +192,7 @@ fun EditScreen(
                         Text(text = "Delete")
                     }
 
+                    // Save data, trim whitespace, update the database and return to home screen
                     Button(
                         onClick = {
                             val updatedBook = book!!.copy(
@@ -196,7 +200,8 @@ fun EditScreen(
                                 author = author.trim(),
                                 genre = genre.trim().ifEmpty { null },
                                 totalPages = totalPages.toIntOrNull() ?: 0,
-                                currentProgress = currentProgress.toIntOrNull() ?: 0,
+                                currentProgress = currentProgress.coerceAtMost(totalPages).toIntOrNull() ?: 0,
+
                                 dateAdded = dateTimestamp
                             )
                             viewModel.updateBook(updatedBook) {

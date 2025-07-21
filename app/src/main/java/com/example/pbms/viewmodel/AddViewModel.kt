@@ -27,33 +27,29 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
     ) {
         viewModelScope.launch {
 
-            val totalPages = totalPages.toIntOrNull()?: 0
+            // user input will be String. String to Int/Null. These are for progress calculation
+            // we need total pages to be minimum 1 for the filter to work later on
+            var totalPages = totalPages.toIntOrNull()?: 1
+
+            // user is not allowed to have 0 pages total :)
+            if (totalPages == 0){
+                totalPages = 1
+            }
             val currentProgress = currentProgress.toIntOrNull() ?: 0
 
             val book = Book(
                 title = title.trim(),
                 author = author.trim(),
                 genre = genre.takeIf { !it.isNullOrBlank() },
-                currentProgress = currentProgress.coerceAtMost(totalPages), //progress is <= totalPages
                 totalPages = totalPages,
+                currentProgress = currentProgress.coerceAtMost(totalPages), //progress is <= totalPages
                 dateAdded = dateAdded
             )
             dao.insertBook(book)
+            println(currentProgress)
 
             onSuccess() // pop back stack
 
-        }
-        fun loadBooks() {
-            viewModelScope.launch {
-                _books.value = dao.getAllBooks()
-            }
-        }
-
-        fun updateBook(book: Book) {
-            viewModelScope.launch {
-                dao.updateBook(book)
-                loadBooks()
-            }
         }
     }
 }

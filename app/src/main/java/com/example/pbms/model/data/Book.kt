@@ -12,8 +12,8 @@ data class Book(
 @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String,
     val author: String,
-    val genre: String?,
-    val dateAdded: Long = System.currentTimeMillis(),
+    val genre: String?, // marked as nullable
+    val dateAdded: Long = System.currentTimeMillis(), // current time in miliseconds
     val currentProgress: Int, // current pages
     val totalPages: Int // total pages
 ) {
@@ -23,7 +23,7 @@ data class Book(
             (currentProgress * 100) / totalPages
         } else 0
 
-
+    // date formatting
     fun formatDate(timestamp: Long): String {
         val sdf = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
         return sdf.format(Date(timestamp))

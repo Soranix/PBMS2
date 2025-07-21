@@ -36,6 +36,11 @@ class HomeViewModel (application: Application) : AndroidViewModel(application){
             _books.value = dao.getAllBooks()
         }
     }
+    fun loadUnreadBooks() {
+        viewModelScope.launch {
+            _books.value = dao.getUnreadBooks()
+        }
+    }
 
     /*
     suspend fun getBookById(id: Int): Book? {

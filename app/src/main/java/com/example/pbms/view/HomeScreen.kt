@@ -18,6 +18,8 @@ import androidx.navigation.NavController
 import com.example.pbms.model.data.Book
 import com.example.pbms.nav.Screen
 import com.example.pbms.viewmodel.HomeViewModel
+import androidx.compose.material.icons.filled.List
+
 
 
 
@@ -27,15 +29,39 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = viewModel()
 ) {
-    val books by viewModel.books.collectAsState()
+    val books by viewModel.books.collectAsState() // all books
     viewModel.loadBooks()
+
+    // I'll need this for filtering out books that have 'progress' >= 100
+    var showOnlyUnread by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text = "My Book", fontWeight = FontWeight.Bold) },
+            CenterAlignedTopAppBar(title = {
+                Text(
+                    text = "My Book",
+                    fontWeight = FontWeight.Bold
+                )
+            },
+                actions = {
+                    IconButton(onClick = {
+                        showOnlyUnread = !showOnlyUnread
+                    if (showOnlyUnread){
+                        viewModel.loadUnreadBooks()
+                    }else{
+                        viewModel.loadBooks()
+                    }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.List,
+                            contentDescription = "Filter books"
+                        )
+                    }
+                },
             )
         },
-        // '+' button. Navigates to the Add screen
+
+        // FAB '+' button. Navigates to the Add screen
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate(Screen.AddScreen.route)},
                 containerColor = Color.Black,
@@ -54,7 +80,7 @@ fun HomeScreen(
             ) {
                 Text("No books yet. Tap + to add one.")
             }
-        } else {
+        } else { // auto scrolling
             LazyColumn(
                 contentPadding = padding,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -75,7 +101,9 @@ fun HomeScreen(
 @Composable
 fun BookItem(book: Book, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(4.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

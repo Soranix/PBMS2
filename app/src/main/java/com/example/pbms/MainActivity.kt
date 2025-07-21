@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             PBMSTheme{
                 // loads nav graph
-                // Database is Instantiated in HomeScreenViewModel
+                // Database is Instantiated in HomeViewModel
                     AppNavigation()
             }
         }

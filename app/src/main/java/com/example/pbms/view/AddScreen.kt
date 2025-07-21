@@ -1,6 +1,7 @@
 package com.example.pbms.view
 
 import android.app.DatePickerDialog
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -33,7 +34,7 @@ fun AddScreen(
     var totalPages by remember { mutableStateOf("") }
     var currentProgress by remember { mutableStateOf("") }
 
-
+    // this is everything I need for selecting a date via a calendar
     val context = LocalContext.current
     val calendar = remember { Calendar.getInstance() }
 
@@ -65,6 +66,7 @@ fun AddScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(title = { Text(text = "Add Book", fontWeight = FontWeight.Bold) },
+                // back button
                 navigationIcon = {
                     IconButton(onClick = {navController.popBackStack() }) {
                         Icon(imageVector = Icons.Default.ArrowBack,
@@ -112,6 +114,7 @@ fun AddScreen(
 
                 OutlinedTextField(
                     value = totalPages,
+                    // that filter will keep only the numbers within the string
                     onValueChange = { totalPages = it.filter { c -> c.isDigit() } },
                     label = { Text("Total Pages") },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
@@ -139,29 +142,34 @@ fun AddScreen(
                         Text(text = if (selectedDate.isEmpty()) "Pick Date" else selectedDate)
                     }
 
+                }
+                    // this button will not appear unless title and author are not blank.
                     Button(
-                        onClick = {
+                        onClick =
+                        {
                             viewModel.addBook(
                                 title = title,
                                 author = author,
                                 genre = genre,
                                 totalPages = totalPages,
                                 currentProgress = currentProgress,
-                                dateAdded = dateTimestamp
+                                dateAdded = dateTimestamp,
+
                             ) {
                                 navController.popBackStack() // onSuccess
                             }
                         },
                         modifier = Modifier,
+                        enabled = title.isNotBlank() && author.isNotBlank(),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Black,
                             contentColor = Color.White
                         )
+
                     ) {
                         Text("Save")
                     }
                 }
             }
-        }
     )
 }
