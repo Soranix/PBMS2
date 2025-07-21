@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel (application: Application) : AndroidViewModel(application){
 
-    /* state management
+    /*
     - UI observes 'books', read only
     - '_books' can be altered by the viewmodel
     - stateflow will not retain data after the application closes.
@@ -37,7 +37,10 @@ class HomeViewModel (application: Application) : AndroidViewModel(application){
         }
     }
 
+    /*
     suspend fun getBookById(id: Int): Book? {
         return dao.getBookById(id)
     }
+
+     */
 }

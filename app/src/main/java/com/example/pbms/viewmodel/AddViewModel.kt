@@ -20,6 +20,7 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
         title: String,
         author: String,
         genre: String?,
+        dateAdded: Long,
         currentProgress: String,
         totalPages: String,
         onSuccess: () -> Unit
@@ -34,7 +35,8 @@ class AddViewModel(application: Application) : AndroidViewModel(application) {
                 author = author.trim(),
                 genre = genre.takeIf { !it.isNullOrBlank() },
                 currentProgress = currentProgress.coerceAtMost(totalPages), //progress is <= totalPages
-                totalPages = totalPages
+                totalPages = totalPages,
+                dateAdded = dateAdded
             )
             dao.insertBook(book)
 

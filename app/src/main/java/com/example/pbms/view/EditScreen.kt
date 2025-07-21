@@ -1,11 +1,15 @@
 package com.example.pbms.view
 
+import android.app.DatePickerDialog
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -25,12 +29,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -38,6 +44,9 @@ import androidx.navigation.NavController
 import com.example.pbms.nav.Screen
 import com.example.pbms.viewmodel.EditViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,15 +55,13 @@ fun EditScreen(
     navController: NavController,
     viewModel: EditViewModel = viewModel()
 ) {
-
-    val book by viewModel.book.collectAsState()
-
     // Load the book once
     LaunchedEffect(bookId) {
         viewModel.loadBook(bookId)
     }
 
-    // Show a loading placeholder
+    val book by viewModel.book.collectAsState()
+    // Show a loading placeholder otherwise the app would crash. viewModel needs to load and update the stateflow
     if (book == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -69,6 +76,38 @@ fun EditScreen(
     var genre by remember { mutableStateOf(book!!.genre ?: "") }
     var totalPages by remember { mutableStateOf(book!!.totalPages.toString()) }
     var currentProgress by remember { mutableStateOf(book!!.currentProgress.toString()) }
+
+    // edit date variables
+    val context = LocalContext.current
+    val calendar = remember { Calendar.getInstance() }
+
+    val format = remember { SimpleDateFormat("dd MMM yyyy", Locale.getDefault()) }
+
+    var selectedDate by remember { mutableStateOf("") }
+    var dateTimestamp by remember { mutableLongStateOf(System.currentTimeMillis()) }
+
+    val datePickerDialog = DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            calendar.set(year, month, dayOfMonth)
+            dateTimestamp = calendar.timeInMillis
+            selectedDate = format.format(calendar.time)
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
+
+
+    /*LaunchedEffect(book){
+        book?.let{
+            calendar.timeInMillis = it.dateAdded
+            selectedDate = format.format(calendar.time)
+            dateTimestamp = it.dateAdded
+        }
+    }
+     */
+
 
     Scaffold(
         topBar = {
@@ -128,6 +167,16 @@ fun EditScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(onClick = { datePickerDialog.show() },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = buttonColors(containerColor = Color.Black, contentColor = Color.White)) {
+                    Text(text = if (selectedDate.isNotEmpty()) selectedDate else "Select Date")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                     Button(
                         onClick = {
@@ -147,9 +196,11 @@ fun EditScreen(
                                 author = author.trim(),
                                 genre = genre.trim().ifEmpty { null },
                                 totalPages = totalPages.toIntOrNull() ?: 0,
-                                currentProgress = currentProgress.toIntOrNull() ?: 0
+                                currentProgress = currentProgress.toIntOrNull() ?: 0,
+                                dateAdded = dateTimestamp
                             )
                             viewModel.updateBook(updatedBook) {
+
                                 navController.popBackStack()
                             }
                         },
@@ -158,6 +209,7 @@ fun EditScreen(
                         Text("Save")
                     }
                 }
+
             }
         }
     )

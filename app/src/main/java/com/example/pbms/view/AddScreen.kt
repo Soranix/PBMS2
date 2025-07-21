@@ -1,45 +1,24 @@
 package com.example.pbms.view
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import android.app.DatePickerDialog
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.pbms.nav.Screen
-import com.example.pbms.viewmodel.AddViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlin.math.exp
+import androidx.navigation.NavController
+import com.example.pbms.viewmodel.AddViewModel
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +32,26 @@ fun AddScreen(
     var genre by remember { mutableStateOf("") }
     var totalPages by remember { mutableStateOf("") }
     var currentProgress by remember { mutableStateOf("") }
+
+
+    val context = LocalContext.current
+    val calendar = remember { Calendar.getInstance() }
+
+    var selectedDate by remember { mutableStateOf("") } // Show to user
+    var dateTimestamp by remember { mutableLongStateOf(System.currentTimeMillis()) } // Save to DB
+
+    val datePickerDialog = DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            calendar.set(year, month, dayOfMonth)
+            dateTimestamp = calendar.timeInMillis
+            val format = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+            selectedDate = format.format(calendar.time)
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
 
     // for genre drop down menu. It was buggy so I removed it
     /*var expanded by remember { mutableStateOf(false) }
@@ -126,26 +125,41 @@ fun AddScreen(
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
-
-                Button(
-                    onClick = {
-                        viewModel.addBook(
-                            title = title,
-                            author = author,
-                            genre = genre,
-                            totalPages = totalPages,
-                            currentProgress = currentProgress
-                        ) {
-                            navController.popBackStack() // onSuccess
-                        }
-                    },
-                    modifier = Modifier.align(Alignment.End),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black,
-                        contentColor = Color.White
-                    )
+                Row(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Save")
+                    Button(
+                        onClick = { datePickerDialog.show() },
+                        modifier = Modifier,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Black,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text(text = if (selectedDate.isEmpty()) "Pick Date" else selectedDate)
+                    }
+
+                    Button(
+                        onClick = {
+                            viewModel.addBook(
+                                title = title,
+                                author = author,
+                                genre = genre,
+                                totalPages = totalPages,
+                                currentProgress = currentProgress,
+                                dateAdded = dateTimestamp
+                            ) {
+                                navController.popBackStack() // onSuccess
+                            }
+                        },
+                        modifier = Modifier,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Black,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Save")
+                    }
                 }
             }
         }
